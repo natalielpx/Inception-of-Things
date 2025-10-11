@@ -4,28 +4,28 @@
 require 'securerandom'
 
 Vagrant.configure("2") do |config|
-	
-  config.vm.box = "generic/debian12"
-  config.vm.box_version = "4.3.12"
-	
-  # Global provider configuration (applies to all machines)
-  config.vm.provider "virtualbox" do |vb|
-		vb.name = "nlam"
-    vb.cpus = 1
-    vb.memory = 1024
+
+	config.vm.box = "generic/debian12"
+	config.vm.box_version = "4.3.12"
+
+	# Global provider configuration (applies to all machines)
+	config.vm.provider "virtualbox" do |vb|
+		vb.cpus = 1
+		vb.memory = 1024
 		vb.gui = false
-  end
-	
+	end
+
 	# Generate random K3S_TOKEN
 	token_file = "k3s_token.txt"
 	token = File.exist?(token_file) ? File.read(token_file).strip : SecureRandom.hex(16)
 	File.write(token_file, token) unless File.exist?(token_file)
 
 	# Machine 1: Server
-  config.vm.define "nlamS" do |server|
+	config.vm.define "nlamS" do |server|
 		server.vm.hostname = "nlamS"
-  	server.vm.network "private_network", ip: "192.168.56.110"
-		server.vm.provision :shell, inline: <<- SHELL
+			server.vm.network "private_network", ip: "192.168.56.110"
+		server.vm.provision "shell", inline: <<-SHELL
+			snap remove curl
 			apt update -
 			apt install -y curl
 			curl -sfL \
@@ -36,10 +36,11 @@ Vagrant.configure("2") do |config|
 	end
 
 	# Machine 2: Server Worker
-  config.vm.define "nlamSW" do |agent|
+	config.vm.define "nlamSW" do |agent|
 		agent.vm.hostname = "nlamSW"
-  	agent.vm.network "private_network", ip: "192.168.56.111"
-		agent.vm.provision :shell, inline: <<- SHELL
+		agent.vm.network "private_network", ip: "192.168.56.111"
+		agent.vm.provision "shell", inline: <<-SHELL
+			snap remove curl	
 			apt update -y
 			apt install -y curl
 			curl -sfL \
@@ -51,4 +52,4 @@ Vagrant.configure("2") do |config|
 		SHELL
 	end
 
-end
+	end
