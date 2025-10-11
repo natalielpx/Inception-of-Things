@@ -11,7 +11,7 @@ Vagrant.configure("2") do |config|
 	# Global provider configuration (applies to all machines)
 	config.vm.provider "virtualbox" do |vb|
 		vb.cpus = 1
-		vb.memory = 1024
+		vb.memory = 512
 		vb.gui = false
 	end
 
