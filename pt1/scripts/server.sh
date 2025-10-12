@@ -6,7 +6,7 @@ apt update && apt install -y curl
 # Install K3s (as server)
 curl -sfL https://get.k3s.io | sh -
 
-# Wait a few seconds to ensure K3s is fully initialized
+# Wait a few seconds to ensure K3s is fully initialised
 sleep 10
 
 # Copy the generated token into the shared folder for the agent
