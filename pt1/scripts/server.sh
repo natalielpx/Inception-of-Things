@@ -6,5 +6,9 @@ apt update && apt install -y curl
 # Install K3s (as server)
 curl -sfL https://get.k3s.io | sh -
 
-# Copy K3s token into synced folder
-cp /var/lib/rancher/k3s/server/token /vagrant_shared
+# Wait a few seconds to ensure K3s is fully initialized
+sleep 10
+
+# Copy the generated token into the shared folder for the agent
+cp /var/lib/rancher/k3s/server/node-token /vagrant_shared/token
+chmod 644 /vagrant_shared/token
