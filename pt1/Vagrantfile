@@ -6,7 +6,7 @@ Vagrant.configure("2") do |config|
 	# Global configurations (applied across all machines)
 	config.vm.box = "generic/debian12"
 	config.vm.box_version = "4.3.12"
-	config.vm.synced_folder = ".shared", "/vagrant_shared"
+	config.vm.synced_folder ".shared", "/vagrant_shared"
 	config.vm.provider "virtualbox" do |vb|
 		vb.cpus = 1
 		vb.memory = 512
