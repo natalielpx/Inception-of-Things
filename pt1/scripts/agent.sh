@@ -13,5 +13,5 @@ done
 export K3S_URL=https://192.168.56.110:6443
 export K3S_TOKEN_FILE=/vagrant_shared/token
 
-# Install K3s (as agent)
-curl -sfL https://get.k3s.io | sh -
+# Install K3s (as agent) with forced IP configuration
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--node-ip=192.168.56.111 --flannel-iface=eth1" sh -

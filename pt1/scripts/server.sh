@@ -3,8 +3,9 @@
 # Install dependencies
 apt update && apt install -y curl
 
-# Install K3s (as server)
-curl -sfL https://get.k3s.io | sh -
+# Install K3s (as server) with forced IP configuration
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--node-ip=192.168.56.110 --flannel-iface=eth1" sh -
+
 
 # Wait a few seconds to ensure K3s is fully initialised
 sleep 10
