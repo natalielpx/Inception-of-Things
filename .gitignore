@@ -1,0 +1,5 @@
+# Vagrant runtime files
+.vagrant/
+
+# Shared folders for token exchange
+.shared/
