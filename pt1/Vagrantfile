@@ -1,9 +1,10 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# Ensure shared folder (synced_folder) exists
+# Ensure shared folder exists and is empty
 require 'fileutils'
-FileUtils.mkdir_p '.shared'
+FileUtils.rm_rf('.shared')
+FileUtils.mkdir_p('.shared')
 
 # Vagrant configuration
 Vagrant.configure("2") do |config|
