@@ -34,7 +34,7 @@ echo "[5/5] Ensure KUBECONFIG is set in .bashrc"
 if ! grep -q "KUBECONFIG" $bashrc; then
   echo "export KUBECONFIG=$conf_file" >> $bashrc
 fi
-# Use `source .bashrc` to execute export in server machine
+echo "Use \`source .bashrc\` to execute export in server machine"
 
 echo "================================================================"
 echo "COMPLETED: setup.sh"
