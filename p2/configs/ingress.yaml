@@ -1,0 +1,39 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress # handles HTTP/HTTPS routing rules
+metadata:
+  name: iot-ingress
+spec:
+  ingressClassName: traefik
+  rules:
+  # Route app1.com to app1
+  - host: app1.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: app1-service
+            port:
+              number: 80
+  # Route app2.com to app1
+  - host: app2.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: app2-service
+            port:
+              number: 80
+  # Route everything else to app3 (default backend)
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: app3-service
+            port:
+              number: 80

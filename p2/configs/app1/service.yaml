@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: app1-service
+spec:
+  # Create endpoint to selected pod
+  selector:
+    app: app1
+  # Port Service will listen on
+  ports:
+    - port: 80
+      targetPort: http
