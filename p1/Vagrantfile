@@ -10,26 +10,26 @@ FileUtils.mkdir_p('.shared')
 Vagrant.configure("2") do |config|
 
 	# Global configurations (applied across all machines)
-	config.vm.box = "generic/alpine318"
-	config.vm.synced_folder ".shared", "/vagrant_shared"
+	config.vm.box = "bento/debian-12"
 	config.vm.provider "virtualbox" do |vb|
 		vb.cpus = 1
-		vb.memory = 512
-		vb.gui = false
+		vb.memory = 1024
+		vb.gui = true
 	end
 
 	# Machine 1: Server
 	config.vm.define "nlamS" do |server|
 		server.vm.hostname = "nlamS"
 		server.vm.network "private_network", ip: "192.168.56.110"
-		server.vm.provision "shell", path: "scripts/server.sh"
 	end
 
 	# Machine 2: Server Worker
 	config.vm.define "nlamSW" do |agent|
 		agent.vm.hostname = "nlamSW"
 		agent.vm.network "private_network", ip: "192.168.56.111"
-		agent.vm.provision "shell", path: "scripts/agent.sh"
+		# agent.vm.provision "file", 
+      	# 	source: ".vagrant/machines/nlamS/virtualbox/private_key",
+      	# 	destination: "/home/vagrant/key.txt"
 	end
 
 end
