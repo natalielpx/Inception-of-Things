@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -e
+
+echo "================================================================"
+echo "RUNNING: agent.sh"
+echo "Installs K3s as agent on local machine"
+echo "================================================================"
+
+echo "[1/3] Installing dependencies"
+apt-get update && apt-get install -y curl openssh.client
+
+echo "[2/3] Exporting essential variables"
+export K3S_URL=https://192.168.56.110:6443
+export K3S_TOKEN=$(ssh -o StrictHostKeyChecking=no \
+			-o ConnectTimeout=5 \
+			-i "/home/vagrant/key.txt" \
+			"vagrant@192.168.56.110" \
+			"sudo cat /var/lib/rancher/k3s/server/node-token")
+
+echo "[3/3] Installing K3s as agent"
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--node-ip=192.168.56.111" sh -
+
+
+echo "================================================================"
+echo "COMPLETED: server.sh"
+echo "================================================================"

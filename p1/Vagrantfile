@@ -1,35 +1,32 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# Ensure shared folder exists and is empty
-require 'fileutils'
-FileUtils.rm_rf('.shared')
-FileUtils.mkdir_p('.shared')
-
 # Vagrant configuration
 Vagrant.configure("2") do |config|
 
 	# Global configurations (applied across all machines)
-	config.vm.box = "bento/debian-12"
-	config.vm.provider "virtualbox" do |vb|
-		vb.cpus = 1
-		vb.memory = 1024
-		vb.gui = true
+	config.vm.box = "generic/debian12"
+	config.vm.box_version = "4.3.12"
+	config.vm.provider "libvirt" do |lv|
+		lv.cpus = 1
+		lv.memory = 1024
 	end
 
 	# Machine 1: Server
 	config.vm.define "nlamS" do |server|
 		server.vm.hostname = "nlamS"
 		server.vm.network "private_network", ip: "192.168.56.110"
+		server.vm.provision "shell", path: "./scripts/server.sh"
 	end
 
 	# Machine 2: Server Worker
 	config.vm.define "nlamSW" do |agent|
 		agent.vm.hostname = "nlamSW"
 		agent.vm.network "private_network", ip: "192.168.56.111"
-		# agent.vm.provision "file", 
-      	# 	source: ".vagrant/machines/nlamS/virtualbox/private_key",
-      	# 	destination: "/home/vagrant/key.txt"
+		agent.vm.provision "file", 
+			source: ".vagrant/machines/nlamS/libvirt/private_key",
+			destination: "/home/vagrant/key.txt"
+		agent.vm.provision "shell", path: "./scripts/agent.sh"
 	end
 
 end
