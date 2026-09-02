@@ -8,7 +8,7 @@ echo "================================================================"
 
 # Install dependencies
 echo "[1/2] Installing dependencies"
-apt update && apt install -y curl
+apt-get update && apt-get install -y curl
 
 # Install K3s (as server) with forced IP configuration
 echo "[2/2] Installing K3s as server"

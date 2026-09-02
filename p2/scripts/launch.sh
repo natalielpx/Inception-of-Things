@@ -7,7 +7,7 @@ echo "Deploys web applications (app1, app2, app3) and ingress"
 echo "================================================================"
 
 # Constants
-CONF_DIR="/vagrant/configs"
+CONF_DIR="$PWD/configs"
 APPS=(app1 app2 app3)
 
 # Variables

@@ -39,3 +39,4 @@ echo "Use \`source .bashrc\` to execute export in server machine"
 echo "================================================================"
 echo "COMPLETED: setup.sh"
 echo "================================================================"
+
