@@ -1,0 +1,29 @@
+
+---
+- name: Install and configure K3s server
+  hosts: k3s_server
+  become: true
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  
+- name: Install dependencies
+  ansible.builtin.apt:
+  name: curl
+  update_cache: true
+  status: present
+
+- name: Install K3s server
+  ansible.builtin.shell:
+    cmd: curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--node-ip={{ k3s_server_ip }} --flannel-iface=eth1" sh -
+    creates: /usr/local/bin/k3s     # skips task if file already exists
+
+- name: Create objects (deployments and services) from manifests
+  # https://docs.ansible.com/projects/ansible/latest/collections/kubernetes/core/k8s_module.html
+  kubernetes.core.k8s:
+  state: present
+  src: {{ item }}
+  loop:
+    - configs/app1.yaml
+    - configs/app2.yaml
+    - configs/app3.yaml
+    - configs/ingress.yaml

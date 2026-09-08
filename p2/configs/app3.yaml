@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app3-deployment
+spec:
+  selector:
+    matchLabels:
+      app: app3
+  template:
+    metadata:
+      labels:
+        app: app3
+    spec:
+      containers:
+        - name: app3
+          image: traefik/whoami
+          ports:
+            - name: http
+              containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app3-service
+spec:
+  selector:
+    app: app3
+  ports:
+    - port: 80
+      targetPort: http
+
+
+# replicas	Deployment spec	Defaults to 1 if omitted — be explicit
+# resources	container spec	CPU/memory limits should always be set
+# namespace	both resources	Defaults to default — be explicit
+# type	Service spec	Defaults to ClusterIP — be explicit

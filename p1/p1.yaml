@@ -1,0 +1,21 @@
+---
+- name: Install K3s server and agent after all hosts are available
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Wait for connection
+      # https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/wait_for_connection_module.html
+      ansible.builtin.wait_for_connection:
+        timeout: 10
+      register: connection_result
+      ignore_errors: true
+
+    - name: Abort if any host unreachable
+      ansible.builtin.meta: end_play
+      when: connection_result.failed
+
+    - name: Import kube cluster playbook
+      # https://github.com/k3s-io/k3s-ansible
+      # https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/import_playbook_module.html
+      ansible.builtin.import_playbook: k3s.orchestration.site
