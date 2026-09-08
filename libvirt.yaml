@@ -1,0 +1,56 @@
+handlers:
+  - name: Reboot host
+    ansible.builtin.reboot:
+      reboot_timeout: 300
+
+tasks:
+- name: Install packages and dependencies
+  ansible.builtin.apt:
+    name:
+      - qemu-system
+      - qemu-kvm
+      - libvirt-daemon-system
+      - libvirt-daemon
+      - virtinst
+      - bridge-utils
+      - libosinfo-bin
+      - libguestfs-tools
+      - build-essential
+      - ruby-dev
+      - pkg-config
+      - libvirt-dev
+    update_cache: true
+    state: present
+
+- name: Install vagrant-libvirt plugin
+  ansible.builtin.command:
+    cmd: vagrant plugin install vagrant-libvirt
+  become: false  # run as the target user, not root
+  changed_when: false
+
+- name: Configure /etc/network/interfaces
+  ansible.builtin.copy:
+    dest: /etc/network/interfaces
+    owner: root
+    group: root
+    mode: '0644'
+    content: |
+      source /etc/network/interfaces.d/*
+
+      auto lo
+      iface lo inet loopback
+
+      allow-hotplug enp1s0
+      iface enp1s0 inet manual
+
+      auto br0
+      iface br0 inet static
+        address 10.0.0.30
+        network 10.0.0.0
+        netmask 255.255.255.0
+        broadcast 10.0.0.255
+        dns-nameservers 10.0.0.10
+        bridge_ports enp1s0
+        bridge_stp off
+        hwaddress ether 52:54:00:0a:a7:f3
+  notify: Reboot host

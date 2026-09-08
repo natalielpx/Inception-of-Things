@@ -1,0 +1,39 @@
+- name: Check GitHub SSH connection
+  ansible.builtin.command:
+    cmd: ssh -T git@github.com -o StrictHostKeyChecking=no
+  register: result
+  changed_when: false
+
+- name: Register SSH key
+  when: result.rc not in [0, 1]
+  block:
+  - name: Ensure SSH keypair
+    # https://docs.ansible.com/projects/ansible/latest/collections/community/crypto/openssh_keypair_module.html
+    community.crypto.openssh_keypair:
+      path: ~/.ssh/id_ed25519
+      type: ed25519
+      regenerate: full_idempotence
+      private_key_format: ssh
+
+  - name: Print public key
+    # https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/file_lookup.html
+    ansible.builtin.debug:
+      var: lookup('ansible.builtin.file', '~/.ssh/id_ed25519.pub')
+
+  - name: Pause to register public key in github
+    # https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/pause_module.html
+    ansible.builtin.pause:
+      prompt: "To continue press ctrl+c and then c"
+
+  - name: Confirm GitHub SSH connection
+    ansible.builtin.command:
+      cmd: ssh -T git@github.com -o StrictHostKeyChecking=no
+    register: result
+    failed_when: result.rc not in [0, 1]
+    changed_when: false
+
+- name: Clone GitHub repository
+  ansible.builtin.git:
+    repo: git@github.com:nlam/Inception-of-Things.git
+    dest: ~/iot
+    version: main
