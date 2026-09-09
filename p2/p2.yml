@@ -1,0 +1,43 @@
+
+---
+- name: Import K3s cluster playbook
+  ansible.builtin.import_playbook: k3s.orchestration.site
+
+- name: Install dependencies
+  hosts: server
+  become: true
+  tasks:
+    - name: Install pip and kubernetes library
+      ansible.builtin.apt:
+        name:
+          - curl
+          - python3-pip
+          - python3-kubernetes
+        state: present
+        update_cache: true
+
+- name: Launch application
+  hosts: server
+  become: true
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  vars:
+    conf_dir: configs/
+  tasks:
+    - name: Copy manifests
+      ansible.builtin.copy:
+        src: "{{ conf_dir }}"
+        dest: "~/{{ conf_dir }}"
+        owner: vagrant
+        group: vagrant
+        mode: '0644'
+    - name: Create objects (deployments and services) from manifests
+      # https://docs.ansible.com/projects/ansible/latest/collections/kubernetes/core/k8s_module.html
+      kubernetes.core.k8s:
+        state: present
+        src: "~/{{ conf_dir }}{{ item }}"
+      loop:
+        - app1.yaml
+        - app2.yaml
+        - app3.yaml
+        - ingress.yaml

@@ -15,7 +15,8 @@
       ansible.builtin.meta: end_play
       when: connection_result.failed
 
-    - name: Import kube cluster playbook
-      # https://github.com/k3s-io/k3s-ansible
-      # https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/import_playbook_module.html
-      ansible.builtin.import_playbook: k3s.orchestration.site
+
+- name: Import kube cluster playbook
+  # https://github.com/k3s-io/k3s-ansible
+  # https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/import_playbook_module.html
+  ansible.builtin.import_playbook: k3s.orchestration.site

@@ -1,26 +1,37 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+SERVER		= "nlamS"
+SERVER_IP	= "192.168.56.110"
+K3S_VERS	= "v1.31.4+k3s1"
+
 # Vagrant configuration
 Vagrant.configure("2") do |config|
 
 	# Global configurations (applied across all machines)
-	config.vm.box = "generic/debian12"
-	config.vm.box_version = "4.3.12"
-	config.vm.provider "libvirt" do |lv|
+	# config.vm.box = "generic/debian12"
+	# config.vm.box_version = "4.3.12"
+	# config.vm.provider "libvirt" do |lv|
+	config.vm.box = "bento/debian-12"
+	config.vm.provider "vmware_desktop" do |lv|
 		lv.cpus = 1
 		lv.memory = 1024
 	end
 
 	# Server Machine
-	config.vm.define "nlamS" do |server|
-		server.vm.hostname = "nlamS"
-		server.vm.network "private_network", ip: "192.168.56.110"
+	config.vm.define SERVER do |server|
+		server.vm.hostname = SERVER
+		server.vm.network "private_network", ip: SERVER_IP
 		server.vm.provision "ansible" do |ansible|
 			ansible.playbook = "p2.yml"
 			ansible.limit = "all"
 			ansible.groups = {
-				"server" => ["server"]
+				"k3s_cluster" => [SERVER],
+				"server" => [SERVER]
+			}
+			ansible.extra_vars = {
+				k3s_version: K3S_VERS,
+				api_endpoint: SERVER_IP
 			}
 		end
 	end
