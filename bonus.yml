@@ -1,0 +1,32 @@
+# https://oneuptime.com/blog/post/2026-02-21-how-to-use-ansible-to-deploy-to-kubernetes-via-helm/view
+
+- name: Install GitLab via Helm
+  hosts: all
+  vars:
+    namespace: gitlab
+  tasks:
+
+  - name: Create GitLab namespace
+    # https://docs.ansible.com/projects/ansible/latest/collections/kubernetes/core/k8s_module.html
+    kubernetes.core.k8s:
+      name: "{{ namespace }}"
+      api_version: v1
+      kind: Namespace
+      state: present
+
+  - name: Add GitLab Helm charts repository
+    kubernetes.core.helm_repository:
+      name: gitlab
+      repo_url: https://kubernetes.github.io/ingress-nginx
+
+  - name: Deploy Helm chart
+    kubernetes.core.helm:
+      name: "{{ release_name }}"
+      chart_ref: "{{ chart_ref }}"
+      chart_version: "{{ chart_version | default(omit) }}"
+      release_namespace: "{{ namespace }}"
+      create_namespace: true
+      values: "{{ helm_values }}"
+      wait: true
+      timeout: 5m
+      atomic: true
