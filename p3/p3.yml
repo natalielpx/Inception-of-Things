@@ -1,0 +1,80 @@
+- name: Setup p3
+  hosts: localhost
+  connection: local
+  vars:
+    k3d_version: 5.9.0
+    user: "{{ lookup('env', 'USER') }}"
+    argocd_version: v3.5.2
+
+  tasks:
+
+    - name: Install dependencies
+      become: true
+      ansible.builtin.apt:
+        name: kubectl
+        update_cache: true
+        state: present
+
+    - name: Install Docker
+      ansible.builtin.include_role:
+        name: geerlingguy.docker
+        apply:
+          become: true
+
+    - name: Add vagrant to docker group
+      become: true
+      ansible.builtin.user:
+        name: "{{ user }}"
+        groups: docker
+        append: true
+
+    - name: Reset connection after Docker group change
+      ansible.builtin.meta: reset_connection
+
+    - name: Install K3D
+      ansible.builtin.include_role:
+        name: averagebit.k3d
+        apply:
+          become: true
+
+    - name: Create .kube directory
+      ansible.builtin.file:
+        path: ~/.kube
+        state: directory
+        mode: '0700'
+
+    - name: Generate k3d kubeconfig
+      ansible.builtin.shell:
+        cmd: k3d kubeconfig get p3 > ~/.kube/config
+
+    - name: Check if k3d cluster p3 exists
+      ansible.builtin.command: k3d cluster list p3
+      register: k3d_cluster
+      changed_when: false
+      failed_when: false
+
+    - name: Create k3d cluster
+      when: k3d_cluster.rc != 0
+      # https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/command_module.html
+      ansible.builtin.command: k3d cluster create p3
+
+    - name: Create dev namespace
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: dev
+
+    - name: Install ArgoCD
+      ansible.builtin.include_role:
+        name: argocd
+        apply:
+          become: true
+
+    - name: Create application
+      # https://docs.ansible.com/projects/ansible/latest/collections/kubernetes/core/k8s_module.html
+      kubernetes.core.k8s:
+        state: present
+        src: "application.yml"
