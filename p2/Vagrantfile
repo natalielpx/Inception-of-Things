@@ -19,6 +19,10 @@ Vagrant.configure("2") do |config|
 	config.vm.define SERVER do |server|
 		server.vm.hostname = SERVER
 		server.vm.network "private_network", ip: SERVER_IP
+		#Provision via Shell
+		# server.vm.provision "shell", path: "scripts/server.sh"
+		# server.vm.provision "shell", path: "scripts/launch.sh"
+		# Provision via Ansible
 		server.vm.provision "ansible" do |ansible|
 			ansible.playbook = "p2.yml"
 			ansible.limit = "all"
