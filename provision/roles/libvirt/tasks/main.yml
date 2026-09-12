@@ -1,0 +1,52 @@
+- name: Check if virsh available
+  ansible.builtin.command: virsh --version
+  register: virsh_check
+  failed_when: false
+  changed_when: false
+
+
+- name: Install libvirt
+  when: virsh_check.rc != 0
+  become: true
+  block:
+  - name: Install packages and dependencies
+    ansible.builtin.apt:
+      name:
+        - qemu-system
+        - qemu-kvm
+        - libvirt-daemon-system
+        - libvirt-daemon
+        - virtinst
+        - bridge-utils
+        - libosinfo-bin
+        - libguestfs-tools
+        - build-essential
+        - ruby-dev
+        - pkg-config
+        - libvirt-dev
+        - ifupdown2
+      update_cache: true
+      state: present
+
+  - name: Install vagrant-libvirt plugin
+    become: false  # run as the target user, not root
+    ansible.builtin.command:
+      cmd: vagrant plugin install vagrant-libvirt
+    changed_when: false
+
+  # - name: Pause to fill in interfaces file
+  #   # https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/pause_module.html
+  #   ansible.builtin.pause:
+  #     prompt: "To continue press ctrl+C and then C"
+
+  # - name: Configure /etc/network/interfaces
+  #   ansible.builtin.copy:
+  #     src: interfaces
+  #     dest: /etc/network/interfaces
+  #     owner: root
+  #     group: root
+  #     mode: '0644'
+
+  # - name: Reload network configuration
+  #   ansible.builtin.command:
+  #     cmd: ifreload -a

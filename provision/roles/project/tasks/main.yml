@@ -1,0 +1,50 @@
+- name: Check GitHub SSH connection
+  ansible.builtin.command:
+    cmd: ssh -T git@github.com -o StrictHostKeyChecking=no
+  register: result
+  failed_when: false
+  changed_when: false
+
+- name: Register SSH key
+  when: result.rc not in [0, 1]
+  block:
+  - name: Ensure SSH keypair
+    # https://docs.ansible.com/projects/ansible/latest/collections/community/crypto/openssh_keypair_module.html
+    community.crypto.openssh_keypair:
+      path: ~/.ssh/id_ed25519
+      type: ed25519
+      regenerate: full_idempotence
+
+  - name: Read public key from VM
+    ansible.builtin.command: cat ~/.ssh/id_ed25519.pub
+    register: public_key
+    changed_when: false
+
+  - name: Print public key
+    ansible.builtin.debug:
+      msg: "{{ public_key.stdout }}"
+
+  - name: Pause to register public key in github
+    # https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/pause_module.html
+    ansible.builtin.pause:
+      prompt: "To continue press ctrl+C and then C"
+
+  - name: Confirm GitHub SSH connection
+    ansible.builtin.command:
+      cmd: ssh -T git@github.com -o StrictHostKeyChecking=no
+    register: result
+    failed_when: result.rc not in [0, 1]
+    changed_when: false
+
+- name: Check if repo already exists
+  ansible.builtin.stat:
+    path: ~/iot
+  register: p
+
+- name: Clone GitHub repository
+  when: not p.stat.exists
+  # https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/git_module.html
+  ansible.builtin.git:
+    repo: git@github.com:natalielpx/Inception-of-Things.git
+    dest: ~/iot
+    version: main

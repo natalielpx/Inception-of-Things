@@ -1,0 +1,14 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: bonus-application
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://gitlab.example.com:31210/panache/nlam-iot
+    targetRevision: HEAD
+    path: .
+  destination:
+    namespace: dev
+    server: https://kubernetes.default.svc

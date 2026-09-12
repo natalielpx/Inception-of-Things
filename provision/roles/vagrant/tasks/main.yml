@@ -1,0 +1,25 @@
+- name: Check if Vagrant installed
+  ansible.builtin.command: vagrant --version
+  register: vagrant_check
+  failed_when: false
+  changed_when: false
+
+- name: Install Vagrant
+  when: vagrant_check.rc != 0
+  become: true
+  block:
+    - name: Add repo using key from URL
+      # https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/deb822_repository_module.html
+      ansible.builtin.deb822_repository:
+        name: vagrant
+        types: deb
+        uris: https://apt.releases.hashicorp.com
+        suites: "{{ ansible_facts['distribution_release'] }}"
+        components: stable
+        architectures: amd64
+        signed_by: https://apt.releases.hashicorp.com/gpg
+    - name: Install Vagrant
+      ansible.builtin.apt:
+        name: vagrant
+        update_cache: true       # ensures package list is up to date before installation
+        state: present
