@@ -8,12 +8,14 @@
       kind: Namespace
       metadata:
         name: argocd
+    kubeconfig: ~/.kube/config
 
 - name: Install ArgoCD
   kubernetes.core.k8s:
     state: present
     src: "https://raw.githubusercontent.com/argoproj/argo-cd/{{ argocd_version }}/manifests/install.yaml"
     namespace: argocd
+    kubeconfig: ~/.kube/config
 
 - name: Wait for ArgoCD server to be ready
   kubernetes.core.k8s_info:
@@ -26,12 +28,14 @@
     wait_condition:
       type: Available
       status: "True"
+    kubeconfig: ~/.kube/config
 
 - name: Get initial admin password
   kubernetes.core.k8s_info:
     kind: Secret
     namespace: argocd
     name: argocd-initial-admin-secret
+    kubeconfig: ~/.kube/config
   register: argocd_secret
 
 - name: Display admin password
