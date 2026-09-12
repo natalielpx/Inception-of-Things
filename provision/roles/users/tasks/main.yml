@@ -1,0 +1,9 @@
+# Adds sudo without password to user
+
+- name: Add sudoers file
+  ansible.builtin.copy:
+    src: sudoers_nlam
+    dest: /etc/sudoers.d/nlam
+    mode: '440'
+  become: true
+# https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/copy_module.html

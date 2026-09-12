@@ -1,0 +1,15 @@
+- name: iot
+  hosts: vm
+  roles:
+    # General
+    - users
+    - git
+    # p1 & p2
+    - project
+    - vagrant
+    - libvirt
+    # p3
+    # - k3d
+    # - argocd
+    # bonus
+    # - bonus

@@ -1,0 +1,32 @@
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+source /etc/network/interfaces.d/*
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+allow-hotplug ens3
+# change existing setting like follows
+iface ens3 inet manual
+
+# add bridge interface setting
+# for [hwaddress] line, specify the same MAC address with physical one ([ens3] on this example)
+# set this param explicitly if different MAC address is assigned to bridge ingterface
+auto br0
+iface br0 inet static
+# obtain via `ip -4 addr show ens3`
+# inet
+address 10.0.2.15/24
+# obtain via `ip route`
+# default via 10.0.2.2
+gateway 10.0.2.2
+# obtain via `cat /etc/resolv.conf`
+dns-nameservers 10.0.2.3
+bridge_ports ens3
+bridge_stp off
+# obtain via `ip addr show ens3`
+# link/ether 52:54:00:12:34:56 brd ff:ff:ff:ff:ff:ff
+hwaddress ether 52:54:00:12:34:56
