@@ -33,9 +33,7 @@
       chart_ref: gitlab/gitlab
       chart_version: 9.11.12
       release_namespace: gitlab
-      create_namespace: true
       values_files:
         - $HOME/values.yml
       wait: true
       timeout: 15m
-      atomic: true
