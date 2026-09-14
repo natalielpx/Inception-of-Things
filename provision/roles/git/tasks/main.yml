@@ -1,6 +1,0 @@
-- name: Ensure Git installed
-  become: true
-  ansible.builtin.apt:
-    name: git
-    update_cache: true       # ensures package list is up to date before installation
-    state: present

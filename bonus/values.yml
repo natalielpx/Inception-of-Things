@@ -1,5 +1,3 @@
-# gitlab-values.yml
-
 global:
   edition: ce
 

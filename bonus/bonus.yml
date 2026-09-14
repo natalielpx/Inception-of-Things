@@ -1,25 +1,13 @@
 # https://oneuptime.com/blog/post/2026-02-21-how-to-use-ansible-to-deploy-to-kubernetes-via-helm/view
 
 - name: Install GitLab via Helm
-  hosts: localhost
-  connection: local
-  vars:
-    ns: gitlab
-    release_name: gitlab
-    chart_ref: "gitlab/gitlab"
-
+  hosts: vm
   tasks:
-
-  - name: Install Helm
-    ansible.builtin.include_role:
-      name: helm
-      apply:
-        become: true
 
   - name: Create GitLab namespace
     # https://docs.ansible.com/projects/ansible/latest/collections/kubernetes/core/k8s_module.html
     kubernetes.core.k8s:
-      name: "{{ ns }}"
+      name: gitlab
       api_version: v1
       kind: Namespace
       state: present
@@ -33,15 +21,21 @@
     ansible.builtin.command: helm repo update
     changed_when: false
 
+  - name: Copy values file to VM
+    ansible.builtin.copy:
+      src: values.yml
+      dest: $HOME/values.yml
+      mode: '0644'
+
   - name: Deploy Helm chart
     kubernetes.core.helm:
-      name: "{{ release_name }}"
-      chart_ref: "{{ chart_ref }}"
+      name: gitlab
+      chart_ref: gitlab/gitlab
       chart_version: 9.11.12
-      release_namespace: "{{ ns }}"
+      release_namespace: gitlab
       create_namespace: true
       values_files:
-        - gitlab-values.yml
+        - $HOME/values.yml
       wait: true
-      timeout: 7m
+      timeout: 15m
       atomic: true

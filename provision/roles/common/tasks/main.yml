@@ -1,0 +1,12 @@
+- name: Ensure basic packages installed
+  become: true
+  ansible.builtin.apt:
+    name: 
+    - curl
+    - git
+    - iptables
+    - iproute2
+    - kubectl
+    - python3-kubernetes
+    state: present
+    update_cache: true       # ensures package list is up to date before installation

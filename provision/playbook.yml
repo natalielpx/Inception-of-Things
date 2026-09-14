@@ -3,13 +3,24 @@
   roles:
     # General
     - users
-    - git
-    # p1 & p2
+    - common
     - project
+    # p1 & p2
     - vagrant
-    - libvirt
+    - virtualbox
     # p3
-    # - k3d
-    # - argocd
+    - role: geerlingguy.docker  # Docker
+      become: true
+    - role: averagebit.k3d      # K3d
+      become: true
     # bonus
-    # - bonus
+    - helm
+  post_tasks:
+    - name: Add user to groups
+      become: true
+      ansible.builtin.user:
+        name: "nlam"
+        groups:
+          - docker
+          - vboxusers
+        append: true

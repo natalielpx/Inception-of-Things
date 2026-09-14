@@ -8,7 +8,7 @@
       kind: Namespace
       metadata:
         name: argocd
-    kubeconfig: ~/.kube/config
+    kubeconfig: $HOME/.kube/config
 
 - name: Install ArgoCD
   kubernetes.core.k8s:
