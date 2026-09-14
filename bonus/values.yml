@@ -1,0 +1,85 @@
+global:
+  hosts:
+    domain: 127.0.0.1.nip.io
+    externalIP: 127.0.0.1
+  ingress:
+    configureCertmanager: false
+    class: "traefik"
+    tls:
+      enabled: false
+  hosts:
+    https: false
+  rails:
+    bootsnap:
+      enabled: false
+  pages:
+    enabled: false
+
+certmanager:
+  install: false
+nginx-ingress:
+  enabled: false
+prometheus:
+  install: false
+registry:
+  enabled: false
+gitlab-runner:
+  install: false
+
+redis:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 64Mi
+minio:
+  resources:
+    requests:
+      memory: 64Mi
+      cpu: 10m
+
+gitlab:
+  webservice:
+    minReplicas: 1
+    maxReplicas: 1
+    resources:
+      limits:
+       memory: 1.5G
+      requests:
+        cpu: 100m
+        memory: 900M
+    workhorse:
+      resources:
+        limits:
+          memory: 100M
+        requests:
+          cpu: 10m
+          memory: 10M
+  sidekiq:
+    minReplicas: 1
+    maxReplicas: 1
+    resources:
+      limits:
+        memory: 1.5G
+      requests:
+        cpu: 50m
+        memory: 625M
+  gitaly:
+    minReplicas: 1
+    maxReplicas: 1
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+  gitlab-shell:
+    enabled: false
+  toolbox:
+    enabled: false
+  praefect:
+    enabled: false
+  kas:
+    enabled: false  # kubernetes agent server
+  spamcheck:
+    enabled: false  # spam checking service
