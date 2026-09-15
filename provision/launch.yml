@@ -84,9 +84,9 @@
     kubernetes.core.k8s:
       state: present
       src: "$HOME/iot/p3/{{ item }}"
-      loop:
-        - application.yml
-        - ingress.yml
+    loop:
+      - application.yml
+      - ingress.yml
 
 
 # https://oneuptime.com/blog/post/2026-02-21-how-to-use-ansible-to-deploy-to-kubernetes-via-helm/view
