@@ -1,22 +1,22 @@
 global:
   hosts:
-    domain: 127.0.0.1.nip.io
-    externalIP: 127.0.0.1
+    domain: localhost
+    gitlab:
+      name: localhost
+    minio:
+      name: minio.localhost
+    https: false
   ingress:
     configureCertmanager: false
     class: "traefik"
     tls:
       enabled: false
-  hosts:
-    https: false
   rails:
     bootsnap:
       enabled: false
   pages:
     enabled: false
 
-certmanager:
-  install: false
 nginx-ingress:
   enabled: false
 prometheus:
@@ -42,37 +42,48 @@ gitlab:
     minReplicas: 1
     maxReplicas: 1
     resources:
-      limits:
-       memory: 1.5G
       requests:
         cpu: 100m
-        memory: 900M
+        memory: 1G
+      limits:
+        memory: 2G
     workhorse:
       resources:
-        limits:
-          memory: 100M
         requests:
           cpu: 10m
           memory: 10M
+        limits:
+          memory: 100M
   sidekiq:
     minReplicas: 1
     maxReplicas: 1
     resources:
-      limits:
-        memory: 1.5G
       requests:
         cpu: 50m
-        memory: 625M
+        memory: 750M
+      limits:
+        memory: 1.5G
   gitaly:
-    minReplicas: 1
-    maxReplicas: 1
     resources:
       requests:
         cpu: 100m
-        memory: 256Mi
+        memory: 300Mi
       limits:
-        cpu: 500m
-        memory: 512Mi
+        memory: 600Mi
+  redis:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        memory: 256Mi
+  minio:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        memory: 256Mi
   gitlab-shell:
     enabled: false
   toolbox:

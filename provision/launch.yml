@@ -1,0 +1,123 @@
+- name: Setup p3
+  hosts: vm
+  vars:
+    argocd_version: v3.5.2
+
+  tasks:
+
+  - name: Check if k3d cluster p3 exists
+    ansible.builtin.command: k3d cluster list p3
+    register: k3d_cluster
+    changed_when: false
+    failed_when: false
+
+  - name: Create k3d cluster
+    when: k3d_cluster.rc != 0
+    # https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/command_module.html
+    ansible.builtin.command: >
+        k3d cluster create p3
+        --port "8080:80@loadbalancer"
+        --port "8443:443@loadbalancer"
+
+
+  - name: Create .kube directory
+    ansible.builtin.file:
+      path: $HOME/.kube
+      state: directory
+      mode: '0700'
+
+  - name: Generate k3d kubeconfig
+    ansible.builtin.shell:
+      cmd: k3d kubeconfig get p3 > $HOME/.kube/config
+
+  - name: Create dev namespace
+    kubernetes.core.k8s:
+      state: present
+      definition:
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: dev
+
+  - name: Create ArgoCD namespace
+    kubernetes.core.k8s:
+      state: present
+      definition:
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: argocd
+
+  - name: Install ArgoCD
+    kubernetes.core.k8s:
+      state: present
+      src: "https://raw.githubusercontent.com/argoproj/argo-cd/{{ argocd_version }}/manifests/install.yaml"
+      namespace: argocd
+
+  - name: Wait for ArgoCD server to be ready
+    kubernetes.core.k8s_info:
+      api_version: apps/v1
+      kind: Deployment
+      namespace: argocd
+      name: argocd-server
+      wait: true
+      wait_timeout: 120
+      wait_condition:
+        type: Available
+        status: "True"
+    failed_when: false
+
+  - name: Get initial admin password
+    kubernetes.core.k8s_info:
+      kind: Secret
+      namespace: argocd
+      name: argocd-initial-admin-secret
+    register: argocd_secret
+
+  - name: Display admin password
+    ansible.builtin.debug:
+      msg: "ArgoCD admin password: {{ argocd_secret.resources[0].data.password | b64decode }}"
+    no_log: false
+
+  - name: Create application
+    # https://docs.ansible.com/projects/ansible/latest/collections/kubernetes/core/k8s_module.html
+    kubernetes.core.k8s:
+      state: present
+      src: "{{ playbook_dir }}/application.yml"
+
+
+# https://oneuptime.com/blog/post/2026-02-21-how-to-use-ansible-to-deploy-to-kubernetes-via-helm/view
+
+  - name: Create GitLab namespace
+    # https://docs.ansible.com/projects/ansible/latest/collections/kubernetes/core/k8s_module.html
+    kubernetes.core.k8s:
+      name: gitlab
+      api_version: v1
+      kind: Namespace
+      state: present
+
+  - name: Add GitLab Helm repository
+    kubernetes.core.helm_repository:
+      name: gitlab
+      repo_url: https://charts.gitlab.io
+
+  - name: Update Helm repositories
+    ansible.builtin.command: helm repo update
+    changed_when: false
+
+  - name: Copy values file to VM
+    ansible.builtin.copy:
+      src: ../values.yml
+      dest: $HOME/values.yml
+      mode: '0644'
+
+  - name: Deploy Helm chart
+    kubernetes.core.helm:
+      name: gitlab
+      chart_ref: gitlab/gitlab
+      chart_version: 9.11.12
+      release_namespace: gitlab
+      values_files:
+        - $HOME/values.yml
+      wait: true
+      timeout: 15m
