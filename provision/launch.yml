@@ -83,7 +83,10 @@
     # https://docs.ansible.com/projects/ansible/latest/collections/kubernetes/core/k8s_module.html
     kubernetes.core.k8s:
       state: present
-      src: "{{ playbook_dir }}/application.yml"
+      src: "$HOME/iot/p3/{{ item }}"
+      loop:
+        - application.yml
+        - ingress.yml
 
 
 # https://oneuptime.com/blog/post/2026-02-21-how-to-use-ansible-to-deploy-to-kubernetes-via-helm/view
@@ -105,12 +108,6 @@
     ansible.builtin.command: helm repo update
     changed_when: false
 
-  - name: Copy values file to VM
-    ansible.builtin.copy:
-      src: ../values.yml
-      dest: $HOME/values.yml
-      mode: '0644'
-
   - name: Deploy Helm chart
     kubernetes.core.helm:
       name: gitlab
@@ -118,6 +115,6 @@
       chart_version: 9.11.12
       release_namespace: gitlab
       values_files:
-        - $HOME/values.yml
+        - "$HOME/iot/bonus/values.yml"
       wait: true
       timeout: 15m
