@@ -2,7 +2,7 @@ global:
   hosts:
     domain: localhost
     gitlab:
-      name: localhost
+      name: gitlab.localhost
     minio:
       name: minio.localhost
     https: false
@@ -44,9 +44,9 @@ gitlab:
     resources:
       requests:
         cpu: 100m
-        memory: 1G
+        memory: 3G
       limits:
-        memory: 2G
+        memory: 4G
     workhorse:
       resources:
         requests:
@@ -57,6 +57,7 @@ gitlab:
   sidekiq:
     minReplicas: 1
     maxReplicas: 1
+    concurrency: 10
     resources:
       requests:
         cpu: 50m
