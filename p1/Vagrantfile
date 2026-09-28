@@ -5,7 +5,7 @@ SERVER		= "nlamS"
 SERVER_IP	= "192.168.56.110"
 AGENT		= "nlamSW"
 AGENT_IP	= "192.168.56.111"
-K3S_VERS	= "v1.31.4+k3s1"
+# K3S_VERS	= "v1.31.4+k3s1"
 
 # Vagrant configuration
 Vagrant.configure("2") do |config|

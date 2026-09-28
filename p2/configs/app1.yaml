@@ -5,6 +5,7 @@ metadata:
   name: app1-deployment
   namespace: default
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: app1
@@ -27,6 +28,7 @@ metadata:
   name: app1-service
   namespace: default
 spec:
+  type: ClusterIP
   # Create endpoint to selected pod
   selector:
     app: app1

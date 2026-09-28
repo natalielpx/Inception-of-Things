@@ -17,7 +17,7 @@ spec:
             name: app1-service
             port:
               number: 80
-  # Route app2.com to app1
+  # Route app2.com to app2
   - host: app2.com
     http:
       paths:

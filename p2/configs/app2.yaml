@@ -28,6 +28,7 @@ metadata:
   name: app2-service
   namespace: default
 spec:
+  type: ClusterIP
   selector:
     app: app2
   ports:

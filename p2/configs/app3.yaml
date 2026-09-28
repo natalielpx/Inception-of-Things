@@ -5,6 +5,7 @@ metadata:
   name: app3-deployment
   namespace: default
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: app3
@@ -27,14 +28,9 @@ metadata:
   name: app3-service
   namespace: default
 spec:
+  type: ClusterIP
   selector:
     app: app3
   ports:
     - port: 80
       targetPort: http
-
-
-# replicas	Deployment spec	Defaults to 1 if omitted — be explicit
-# resources	container spec	CPU/memory limits should always be set
-# namespace	both resources	Defaults to default — be explicit
-# type	Service spec	Defaults to ClusterIP — be explicit
