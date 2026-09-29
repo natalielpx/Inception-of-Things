@@ -44,9 +44,9 @@ gitlab:
     resources:
       requests:
         cpu: 100m
-        memory: 3G
+        memory: 2G
       limits:
-        memory: 4G
+        memory: 5G
     workhorse:
       resources:
         requests:
@@ -57,20 +57,20 @@ gitlab:
   sidekiq:
     minReplicas: 1
     maxReplicas: 1
-    concurrency: 10
+    concurrency: 2
     resources:
       requests:
         cpu: 50m
-        memory: 750M
+        memory: 1G
       limits:
-        memory: 1.5G
+        memory: 3G
   gitaly:
     resources:
       requests:
         cpu: 100m
-        memory: 300Mi
+        memory: 500Mi
       limits:
-        memory: 600Mi
+        memory: 1.5G
   redis:
     resources:
       requests:
