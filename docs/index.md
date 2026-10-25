@@ -1185,6 +1185,34 @@ Repeat for app 1 and app2:
 
 Notice that there is an additional configuration `host:` that matches the `Host` header on incoming requests. Then, `backend:` routes it to its service. The absence of this configuration in the previous service means that it is the default service if no matching `Host` headers are provided.
 
+## Verification
+
+Now let's check that ingress is working as intended. Remember to curl from within the server machine. Curling from the host machine will not work since the server machine is set up on a private network.
+
+```bash
+$ curl -H "HOST:app1.com" 192.168.56.110
+Hostname: app1-deployment-6fcb858b89-2xz9x
+IP: 127.0.0.1
+IP: ::1
+IP: 10.42.0.14
+IP: fe80::8fc:3ff:fee7:f7e0
+RemoteAddr: 127.0.0.1:37712
+GET / HTTP/1.1
+Host: 127.0.0.1:8080
+User-Agent: curl/8.5.0
+Accept: */*
+```
+
+You can also check that it works with "app2.com", and with everything else, Hostname should show app3-deployment. Note that curling "app2.com" multiple times will return Hostnames that start with "app2-deployment" but end with different pod ids. This is because we have 3 replicas, and ingress is rotating between them.
+
+```bash
+$ curl -H "HOST:app2.com" 192.168.56.110
+$ curl -H "HOST:app2.com" 192.168.56.110
+$ curl -H "HOST:app2.com" 192.168.56.110
+$ curl -H "HOST:app2.com" 192.168.56.110
+$ curl -H "HOST:nlam.com" 192.168.56.110
+```
+
 ## Configuration Automisation
 
 **Launch Script**
